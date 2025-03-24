@@ -1,0 +1,17 @@
+	DROP TABLE IF EXISTS todos;
+
+    CREATE TABLE todo(
+		id SERIAL PRIMARY KEY,
+		title VARCHAR(255) NOT NULL,
+		description TEXT,
+		is_completed BOOLEAN DEFAULT FALSE,
+		created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE TABLE users (
+    id SERIAL PRIMARY KEY,
+    name VARCHAR(255) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    password TEXT NOT NULL
+);
+
