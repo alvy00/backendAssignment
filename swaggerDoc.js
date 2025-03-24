@@ -9,6 +9,11 @@ const options = {
         version: "1.0.0",
         description: "With auth",
       },
+      servers: [
+        {
+          url: "https://backendassignment-kyw2gkpz4-alvy-ahmeds-projects.vercel.app",
+        },
+      ],
       components: {
         securitySchemes: {
           BearerAuth: {

@@ -1,45 +1,15 @@
 {
-    "version": 2,
-    "builds": [
-      {
-        "src": "api/index.js",
-        "use": "@vercel/node"
-      }
-    ],
-    "routes": [
-      {
-        "src": "/api/todos",
-        "methods": ["GET", "POST", "PUT", "DELETE"],
-        "dest": "/api/index.js"
-      },
-      {
-        "src": "/api/todos/(.*)",
-        "methods": ["GET", "PUT", "DELETE"],
-        "dest": "/api/index.js"
-      },
-      {
-        "src": "/api/auth",
-        "methods": ["POST"],
-        "dest": "/api/index.js"
-      },
-      {
-        "src": "/api/auth/register",
-        "methods": ["POST"],
-        "dest": "/api/index.js"
-      },
-      {
-        "src": "/api/auth/login",
-        "methods": ["POST"],
-        "dest": "/api/index.js"
-      },
-      {
-        "src": "/api-docs(.*)",
-        "dest": "/api/index.js"
-      },
-      {
-        "src": "/(.*)",
-        "dest": "/api/index.js"
-      }
-    ]
-  }
-  
+  "version": 2,
+  "builds": [
+    {
+      "src": "api/index.js",
+      "use": "@vercel/node"
+    }
+  ],
+  "routes": [
+    {
+      "src": "/(.*)",
+      "dest": "/api/index.js"
+    }
+  ]
+}
