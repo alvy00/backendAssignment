@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const supabase = require("../config/supabaseClient");
-const checkAuth = require("../controllers/authController");
+const supabase = require("../../config/supabaseClient");
+const checkAuth = require("../../controllers/authController");
 
 
 /**

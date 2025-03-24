@@ -1,5 +1,5 @@
 const express = require("express");
-const supabase = require("../config/supabaseClient");  // Ensure your Supabase client is correctly initialized
+const supabase = require("../../config/supabaseClient");  // Ensure your Supabase client is correctly initialized
 const bcrypt = require('bcryptjs');
 
 const router = express.Router();
