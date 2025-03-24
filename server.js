@@ -14,8 +14,8 @@ const port = process.env.PORT || 3002;
 // Middlewares
 app.use(express.json());
 app.use(morgan('dev'));
-app.use("/auth", authRoutes);
 app.use("/todos", todoRoutes);
+app.use("/auth", authRoutes);
 app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 app.get('/', (req, res) => {

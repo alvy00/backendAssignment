@@ -3,6 +3,7 @@ const router = express.Router();
 const supabase = require("../config/supabaseClient");
 const checkAuth = require("../controllers/authController");
 
+
 /**
  * @swagger
  * /todos:
@@ -43,8 +44,7 @@ const checkAuth = require("../controllers/authController");
  */
 router.get("/", checkAuth, async (req, res) => {
   const { user } = req;
-  const { data, error } = await supabase
-    .from("todos")
+  const { data, error } = await from("todos")
     .select("*")
     .eq("user_id", user.id);
 
@@ -103,8 +103,7 @@ router.get("/:id", checkAuth, async (req, res) => {
     return res.status(400).json({ message: "ID must be a number" });
   }
 
-  const { data, error } = await supabase
-    .from("todos")
+  const { data, error } = await from("todos")
     .select("*")
     .eq("id", id)
     .eq("user_id", user.id)
@@ -172,8 +171,7 @@ router.post("/", checkAuth, async (req, res) => {
 
   if (!title) return res.status(400).json({ message: "Title is required" });
 
-  const { data, error } = await supabase
-    .from("todos")
+  const { data, error } = await from("todos")
     .insert([{ title, description, user_id: user.id }])
     .select()
     .single();
@@ -216,8 +214,7 @@ router.delete("/:id", checkAuth, async (req, res) => {
     return res.status(400).json({ message: "ID must be a number" });
   }
 
-  const { data, error } = await supabase
-    .from("todos")
+  const { data, error } = await from("todos")
     .delete()
     .eq("id", id)
     .eq("user_id", user.id)
@@ -293,8 +290,7 @@ router.put("/:id", checkAuth, async (req, res) => {
   const { title, description, is_completed } = req.body;
   const { user } = req;
 
-  const { data, error } = await supabase
-    .from("todos")
+  const { data, error } = await from("todos")
     .update({ title, description, is_completed })
     .eq("id", id)
     .eq("user_id", user.id)

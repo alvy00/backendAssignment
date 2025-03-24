@@ -1,8 +1,8 @@
 const express = require("express");
-const router = express.Router();
-const supabase = require("../config/supabaseClient");
+const supabase = require("../config/supabaseClient");  // Ensure your Supabase client is correctly initialized
 const bcrypt = require('bcryptjs');
 
+const router = express.Router();
 const saltRounds = 10;
 
 /**
@@ -49,21 +49,21 @@ const saltRounds = 10;
  *       500:
  *         description: Error during registration process.
  */
-router.post("/register", async (req, res) => {
+router.post("/auth/register", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
-  bcrypt.hash(password, saltRounds, async (err, hashedPassword) => {
-    if (err) {
-      return res.status(500).json({ message: "Error hashing password", error: err.message });
-    }
+  try {
+    // Hash the password using bcrypt
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // Sign up the user using Supabase's auth.signUp method
     const { data, error } = await supabase.auth.signUp({
       email,
-      password: hashedPassword,
+      password: hashedPassword,  // Use hashed password here
     });
 
     if (error) {
@@ -74,7 +74,9 @@ router.post("/register", async (req, res) => {
       message: "User signed up successfully. Please check your email for a verification link.",
       user: data.user,
     });
-  });
+  } catch (error) {
+    res.status(500).json({ message: "Error during registration", error: error.message });
+  }
 });
 
 /**
@@ -126,33 +128,69 @@ router.post("/register", async (req, res) => {
  *       500:
  *         description: Internal server error during login.
  */
-router.post("/login", async (req, res) => {
+router.post("/auth/login", async (req, res) => {
   const { email, password } = req.body;
 
   if (!email || !password) {
     return res.status(400).json({ message: "Email and password are required" });
   }
 
-  const { data, error } = await supabase.auth.signInWithPassword({
-    email,
-    password,
-  });
+  try {
+    const { data, error } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
 
-  if (error) {
-    return res.status(401).json({ message: "Invalid credentials", error: error.message });
+    if (error) {
+      return res.status(401).json({ message: "Invalid credentials", error: error.message });
+    }
+
+    res.status(200).json({
+      message: "Login successful",
+      user: data.user,
+      access_token: data.session.access_token,
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error during login", error: error.message });
   }
+});
 
-  const passwordMatch = await bcrypt.compare(password, data.user.password);
 
-  if (!passwordMatch) {
-    return res.status(401).json({ message: "Invalid credentials" });
+/**
+ * @swagger
+ * /logout:
+ *   post:
+ *     summary: Log out the current user
+ *     description: Logs out the current user by invalidating their session.
+ *     responses:
+ *       200:
+ *         description: Logout successful.
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: "Logout successful"
+ *       500:
+ *         description: Error during logout process.
+ */
+router.post("/auth/logout", async (req, res) => {
+  try {
+    // Log out the user by invalidating their session
+    const { error } = await supabase.auth.signOut();
+
+    if (error) {
+      return res.status(500).json({ message: "Error during logout", error: error.message });
+    }
+
+    res.status(200).json({
+      message: "Logout successful",
+    });
+  } catch (error) {
+    res.status(500).json({ message: "Error during logout", error: error.message });
   }
-
-  res.status(200).json({
-    message: "Login successful",
-    user: data.user,
-    access_token: data.session.access_token,
-  });
 });
 
 module.exports = router;
