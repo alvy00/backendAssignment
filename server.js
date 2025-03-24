@@ -4,6 +4,7 @@ const dotenv = require('dotenv');
 const todoRoutes = require('./routes/todosRoutes');
 const authRoutes = require("./routes/authRoutes");
 const { swaggerUi, swaggerSpec } = require("./swaggerDoc");
+const { serve } = require('swagger-ui-express');
 
 dotenv.config();
 
@@ -25,3 +26,5 @@ app.get('/', (req, res) => {
 app.listen(port, () => {
   console.log(`Server is running on http://localhost:${port}`);
 });
+
+module.exports = app;
