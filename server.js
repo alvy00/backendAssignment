@@ -2,9 +2,9 @@ const express = require('express');
 const serverless = require('serverless-http');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
-const todoRoutes = require('../routes/todosRoutes');
-const authRoutes = require("../routes/authRoutes");
-const { swaggerUi, swaggerSpec } = require("../swaggerDoc");
+const todoRoutes = require('./api/routes/todosRoutes');
+const authRoutes = require("./api/routes/authRoutes");
+const { swaggerUi, swaggerSpec } = require("./api/swaggerDoc");
 
 dotenv.config();
 
