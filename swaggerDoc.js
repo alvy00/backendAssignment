@@ -11,7 +11,7 @@ const options = {
       },
       servers: [
         {
-          url: "https://backendassignment-kyw2gkpz4-alvy-ahmeds-projects.vercel.app",
+          url: "https://backendassignment-beta.vercel.app",
         },
       ],
       components: {
@@ -25,7 +25,7 @@ const options = {
       },
       security: [{ BearerAuth: [] }],
     },
-    apis: ["./routes/authRoutes.js","./routes/todosRoutes.js"],
+    apis: ["./api/routes/authRoutes.js","./api/routes/todosRoutes.js"],
   };
   
 

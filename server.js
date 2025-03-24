@@ -4,11 +4,13 @@ const morgan = require('morgan');
 const dotenv = require('dotenv');
 const todoRoutes = require('./api/routes/todosRoutes');
 const authRoutes = require("./api/routes/authRoutes");
-const { swaggerUi, swaggerSpec } = require("./api/swaggerDoc");
+const { swaggerUi, swaggerSpec } = require("./swaggerDoc");
 
 dotenv.config();
 
 const app = express();
+const port = process.env.PORT || 3001;
+
 
 // Middlewares
 app.use(express.json());
@@ -21,6 +23,10 @@ app.get('/', (req, res) => {
   res.send('Hello World from Vercel!');
 });
 
-// Export for Vercel (no app.listen)
+// app.listen(port, (req, res) => {
+//   console.log("Listening");
+// })
+
+
 module.exports = app;
 module.exports.handler = serverless(app);

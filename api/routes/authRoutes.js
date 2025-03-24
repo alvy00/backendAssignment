@@ -46,6 +46,8 @@ const saltRounds = 10;
  *                       example: "user@example.com"
  *       400:
  *         description: Missing email or password.
+ *       409:
+ *         description: Email already in use.
  *       500:
  *         description: Error during registration process.
  */
@@ -154,7 +156,6 @@ router.post("/auth/login", async (req, res) => {
     res.status(500).json({ message: "Error during login", error: error.message });
   }
 });
-
 
 /**
  * @swagger
