@@ -41,13 +41,14 @@ const specs = swaggerJsDoc(options);
 app.use(express.json());
 app.use(morgan('dev'));
 app.use(cors());
-app.use("/todos", todoRoutes);
-app.use("/auth", authRoutes);
+app.use("/api/todos", todoRoutes);
+app.use("/api", authRoutes);
 app.use(
-  "/api",
+  "/api/docs",
   swaggerUI.serve,
-  swaggerUI.setup(specs, { customCss: '.swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }', 
-                           customCssUrl: CSS_URL })
+  swaggerUI.setup(specs, {
+                            customCss: '.swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }', 
+                            customCssUrl: CSS_URL })
 );
 
 
@@ -55,9 +56,9 @@ app.get('/', (req, res) => {
   res.send('Hello worlddddddddddd :v');
 })
 
-// app.listen(port, (req, res) => {
-//   console.log("Listening");
-// })
+app.listen(port, (req, res) => {
+  console.log("Listening");
+})
 
 
 module.exports = app;

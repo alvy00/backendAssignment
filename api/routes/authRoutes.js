@@ -1,108 +1,107 @@
 const express = require("express");
-const supabase = require("../../config/supabaseClient");  // Ensure your Supabase client is correctly initialized
-const bcrypt = require('bcryptjs');
+const supabase = require("../../config/supabaseClient");
+const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const router = express.Router();
 const saltRounds = 10;
 
 /**
  * @swagger
- * /register:
+ * /api/register:
  *   post:
  *     summary: Register a new user
- *     description: Register a new user with email and password.
+ *     description: Creates a new user with email and password. Stores hashed password in Supabase.
+ *     tags:
+ *       - Authentication
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
+ *               - password
  *             properties:
  *               email:
  *                 type: string
- *                 example: "user@example.com"
+ *                 example: user@example.com
  *               password:
  *                 type: string
- *                 example: "strongpassword123"
+ *                 example: securepassword123
  *     responses:
  *       201:
- *         description: User successfully registered. A verification link has been sent to the user's email.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "User signed up successfully. Please check your email for a verification link."
- *                 user:
- *                   type: object
- *                   properties:
- *                     id:
- *                       type: string
- *                       example: "b85bb9f4-d62b-4bb8-9f80-6d1eeb99f8c1"
- *                     email:
- *                       type: string
- *                       example: "user@example.com"
+ *         description: User registered successfully
  *       400:
- *         description: Missing email or password.
+ *         description: Email and password are required
  *       409:
- *         description: Email already in use.
+ *         description: Email already in use
  *       500:
- *         description: Error during registration process.
+ *         description: Registration error
  */
-router.post("/auth/register", async (req, res) => {
+router.post("/register", async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (!email || !password)
     return res.status(400).json({ message: "Email and password are required" });
-  }
 
   try {
-    // Hash the password using bcrypt
-    const hashedPassword = await bcrypt.hash(password, saltRounds);
+    const { data: existingUsers } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email);
 
-    // Sign up the user using Supabase's auth.signUp method
-    const { data, error } = await supabase.auth.signUp({
-      email,
-      password: hashedPassword,  // Use hashed password here
-    });
-
-    if (error) {
-      return res.status(500).json({ error: error.message });
+    if (existingUsers.length > 0) {
+      return res.status(409).json({ message: "Email already in use" });
     }
 
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const { data, error } = await supabase
+      .from("users")
+      .insert([{ email, password: hashedPassword }])
+      .select("id, email")
+      .single();
+
+    if (error) throw error;
+
     res.status(201).json({
-      message: "User signed up successfully. Please check your email for a verification link.",
-      user: data.user,
+      message: "User registered successfully",
+      user: data,
     });
-  } catch (error) {
-    res.status(500).json({ message: "Error during registration", error: error.message });
+  } catch (err) {
+    res.status(500).json({ message: "Registration error", error: err.message });
   }
 });
 
 /**
  * @swagger
- * /login:
+ * /api/login:
  *   post:
  *     summary: Log in an existing user
- *     description: Log in a user with email and password.
+ *     description: Authenticates user and returns a JWT token.
+ *     tags:
+ *       - Authentication
  *     requestBody:
  *       required: true
  *       content:
  *         application/json:
  *           schema:
  *             type: object
+ *             required:
+ *               - email
+ *               - password
  *             properties:
  *               email:
  *                 type: string
- *                 example: "user@example.com"
+ *                 example: user@example.com
  *               password:
  *                 type: string
- *                 example: "strongpassword123"
+ *                 example: securepassword123
  *     responses:
  *       200:
- *         description: Login successful.
+ *         description: Login successful
  *         content:
  *           application/json:
  *             schema:
@@ -110,88 +109,73 @@ router.post("/auth/register", async (req, res) => {
  *               properties:
  *                 message:
  *                   type: string
- *                   example: "Login successful"
  *                 user:
  *                   type: object
  *                   properties:
  *                     id:
  *                       type: string
- *                       example: "b85bb9f4-d62b-4bb8-9f80-6d1eeb99f8c1"
  *                     email:
  *                       type: string
- *                       example: "user@example.com"
  *                 access_token:
  *                   type: string
- *                   example: "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+ *                   example: eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...
  *       400:
- *         description: Missing email or password.
+ *         description: Missing email or password
  *       401:
- *         description: Invalid credentials.
+ *         description: Invalid credentials
  *       500:
- *         description: Internal server error during login.
+ *         description: Login error
  */
-router.post("/auth/login", async (req, res) => {
+router.post("/login", async (req, res) => {
   const { email, password } = req.body;
 
-  if (!email || !password) {
+  if (!email || !password)
     return res.status(400).json({ message: "Email and password are required" });
-  }
 
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
+    const { data: user, error } = await supabase
+      .from("users")
+      .select("*")
+      .eq("email", email)
+      .single();
 
-    if (error) {
-      return res.status(401).json({ message: "Invalid credentials", error: error.message });
-    }
+    if (error || !user)
+      return res.status(401).json({ message: "Invalid credentials" });
+
+    const passwordMatch = await bcrypt.compare(password, user.password);
+    if (!passwordMatch)
+      return res.status(401).json({ message: "Invalid credentials" });
+
+    const token = jwt.sign(
+      { id: user.id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: "2h" }
+    );
 
     res.status(200).json({
       message: "Login successful",
-      user: data.user,
-      access_token: data.session.access_token,
+      user: { id: user.id, email: user.email },
+      access_token: token,
     });
-  } catch (error) {
-    res.status(500).json({ message: "Error during login", error: error.message });
+  } catch (err) {
+    res.status(500).json({ message: "Login error", error: err.message });
   }
 });
 
 /**
  * @swagger
- * /logout:
+ * /auth/logout:
  *   post:
- *     summary: Log out the current user
- *     description: Logs out the current user by invalidating their session.
+ *     summary: Logout endpoint (client-side only)
+ *     description: Dummy endpoint. Client should delete JWT token manually.
+ *     tags:
+ *       - Authentication
  *     responses:
  *       200:
- *         description: Logout successful.
- *         content:
- *           application/json:
- *             schema:
- *               type: object
- *               properties:
- *                 message:
- *                   type: string
- *                   example: "Logout successful"
- *       500:
- *         description: Error during logout process.
+ *         description: Logout successful (client should delete token)
  */
-router.post("/auth/logout", async (req, res) => {
-  try {
-    // Log out the user by invalidating their session
-    const { error } = await supabase.auth.signOut();
-
-    if (error) {
-      return res.status(500).json({ message: "Error during logout", error: error.message });
-    }
-
-    res.status(200).json({
-      message: "Logout successful",
-    });
-  } catch (error) {
-    res.status(500).json({ message: "Error during logout", error: error.message });
-  }
+router.post("/auth/logout", (req, res) => {
+  res.status(200).json({ message: "Logout successful (client should delete token)" });
 });
 
 module.exports = router;

@@ -1,12 +1,13 @@
 const express = require("express");
 const router = express.Router();
-const supabase = require("../../config/supabaseClient");
-const checkAuth = require("../../controllers/authController");
+const checkAuth = require("../../controllers/authController"); // Ensure this points to your JWT check middleware
 
+// Your database access (replace with your actual DB client)
+const supabase = require("../../config/supabaseClient");
 
 /**
  * @swagger
- * /todos:
+ * /api/todos:
  *   get:
  *     summary: Get all todos for the authenticated user
  *     description: Retrieve all todos for the logged-in user.
@@ -44,9 +45,7 @@ const checkAuth = require("../../controllers/authController");
  */
 router.get("/", checkAuth, async (req, res) => {
   const { user } = req;
-  const { data, error } = await from("todos")
-    .select("*")
-    .eq("user_id", user.id);
+  const { data, error } = await supabase.from("todos").select("*").eq("user_id", user.id);
 
   if (error) return res.status(500).json({ error: error.message });
   res.json(data);
@@ -54,7 +53,7 @@ router.get("/", checkAuth, async (req, res) => {
 
 /**
  * @swagger
- * /todos/{id}:
+ * /api/todos/{id}:
  *   get:
  *     summary: Get a single todo by ID for the authenticated user
  *     description: Retrieve a specific todo by its ID for the logged-in user.
@@ -103,7 +102,8 @@ router.get("/:id", checkAuth, async (req, res) => {
     return res.status(400).json({ message: "ID must be a number" });
   }
 
-  const { data, error } = await from("todos")
+  const { data, error } = await supabase
+    .from("todos")
     .select("*")
     .eq("id", id)
     .eq("user_id", user.id)
@@ -121,7 +121,7 @@ router.get("/:id", checkAuth, async (req, res) => {
 
 /**
  * @swagger
- * /todos:
+ * /api/todos:
  *   post:
  *     summary: Create a new todo for the authenticated user
  *     description: Create a new todo item for the logged-in user.
@@ -171,7 +171,8 @@ router.post("/", checkAuth, async (req, res) => {
 
   if (!title) return res.status(400).json({ message: "Title is required" });
 
-  const { data, error } = await from("todos")
+  const { data, error } = await supabase
+    .from("todos")
     .insert([{ title, description, user_id: user.id }])
     .select()
     .single();
@@ -182,7 +183,7 @@ router.post("/", checkAuth, async (req, res) => {
 
 /**
  * @swagger
- * /todos/{id}:
+ * /api/todos/{id}:
  *   delete:
  *     summary: Delete a todo for the authenticated user
  *     description: Delete a specific todo by its ID for the logged-in user.
@@ -214,7 +215,8 @@ router.delete("/:id", checkAuth, async (req, res) => {
     return res.status(400).json({ message: "ID must be a number" });
   }
 
-  const { data, error } = await from("todos")
+  const { data, error } = await supabase
+    .from("todos")
     .delete()
     .eq("id", id)
     .eq("user_id", user.id)
@@ -228,7 +230,7 @@ router.delete("/:id", checkAuth, async (req, res) => {
 
 /**
  * @swagger
- * /todos/{id}:
+ * /api/todos/{id}:
  *   put:
  *     summary: Update a todo for the authenticated user
  *     description: Update an existing todo item for the logged-in user.
@@ -290,7 +292,8 @@ router.put("/:id", checkAuth, async (req, res) => {
   const { title, description, is_completed } = req.body;
   const { user } = req;
 
-  const { data, error } = await from("todos")
+  const { data, error } = await supabase
+    .from("todos")
     .update({ title, description, is_completed })
     .eq("id", id)
     .eq("user_id", user.id)
@@ -299,7 +302,11 @@ router.put("/:id", checkAuth, async (req, res) => {
 
   if (error) return res.status(500).json({ error: error.message });
 
+  if (!data) return res.status(404).json({ message: "Todo not found" });
+
   res.status(200).json(data);
 });
 
+
 module.exports = router;
+
