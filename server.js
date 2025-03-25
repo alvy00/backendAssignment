@@ -21,15 +21,9 @@ const options = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "Library API",
+      title: "ACS Backend API Assignment",
       version: "1.0.0",
-      description: "A simple Express Library API",
-      termsOfService: "http://example.com/terms/",
-      contact: {
-        name: "API Support",
-        url: "http://www.exmaple.com/support",
-        email: "support@example.com",
-      },
+      description: "With user authentication",
     },
     servers: [
       {
@@ -38,9 +32,9 @@ const options = {
       },
     ],
   },
-  // This is to call all the file
   apis: ["./api/routes/authRoutes.js","./api/routes/todosRoutes.js"],
 };
+
 const specs = swaggerJsDoc(options);
 
 // Middlewares
@@ -52,7 +46,7 @@ app.use("/auth", authRoutes);
 app.use(
   "/api",
   swaggerUI.serve,
-  swaggerUI.setup(specs, { customCssUrl: CSS_URL })
+  swaggerUI.setup(specs, { customCssUrl: '.swagger-ui .opblock .opblock-summary-path-description-wrapper { align-items: center; display: flex; flex-wrap: wrap; gap: 0 10px; padding: 0 10px; width: 100%; }', CSS_URL })
 );
 
 
