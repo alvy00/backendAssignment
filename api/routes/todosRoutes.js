@@ -140,6 +140,9 @@ router.get("/:id", checkAuth, async (req, res) => {
  *               description:
  *                 type: string
  *                 example: "Need to buy milk, eggs, and bread."
+ *               user_id:
+ *                 type: string
+ *                 example: "5c979c35-b5d5-41d4-a32e-0b29e7301f3d"  # Add user_id field here
  *     responses:
  *       201:
  *         description: Todo successfully created.
@@ -160,16 +163,23 @@ router.get("/:id", checkAuth, async (req, res) => {
  *                 is_completed:
  *                   type: boolean
  *                   example: false
+ *                 user_id:
+ *                   type: string
+ *                   example: "5c979c35-b5d5-41d4-a32e-0b29e7301f3d"  # Add user_id field here in response
  *       400:
  *         description: Missing required fields.
  *       500:
  *         description: Internal server error.
  */
 router.post("/", checkAuth, async (req, res) => {
-  const { title, description } = req.body;
+  const { title, description, user_id } = req.body;
   const { user } = req;
 
   if (!title) return res.status(400).json({ message: "Title is required" });
+
+  if (user_id !== user.id) {
+    return res.status(400).json({ message: "User ID mismatch" });
+  }
 
   const { data, error } = await supabase
     .from("todos")
@@ -178,7 +188,7 @@ router.post("/", checkAuth, async (req, res) => {
     .single();
 
   if (error) return res.status(500).json({ error: error.message });
-  res.status(201).json(data);
+  res.status(201).json({ ...data, user_id: user.id });  // Add user_id in response data
 });
 
 /**
