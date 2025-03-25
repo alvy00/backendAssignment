@@ -4,8 +4,9 @@ const morgan = require('morgan');
 const dotenv = require('dotenv');
 const todoRoutes = require('./api/routes/todosRoutes');
 const authRoutes = require("./api/routes/authRoutes");
-import swaggerUI from "swagger-ui-express";
-import swaggerJsDoc from "swagger-jsdoc";
+const swaggerUI = require("swagger-ui-express");
+const swaggerJsDoc = require("swagger-jsdoc");
+
 
 dotenv.config();
 
@@ -39,6 +40,7 @@ const options = {
   // This is to call all the file
   apis: ["./api/routes/authRoutes.js","./api/routes/todosRoutes.js"],
 };
+const specs = swaggerJsDoc(options);
 
 // Middlewares
 app.use(express.json());
@@ -56,9 +58,9 @@ app.get('/', (req, res) => {
   res.send('Hello World from Vercel!');
 });
 
-// app.listen(port, (req, res) => {
-//   console.log("Listening");
-// })
+app.listen(port, (req, res) => {
+  console.log("Listening");
+})
 
 
 module.exports = app;
