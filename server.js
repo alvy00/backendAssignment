@@ -11,13 +11,16 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3001;
 
+const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+const specs = swaggerJsDoc(options);
 
 // Middlewares
 app.use(express.json());
 app.use(morgan('dev'));
 app.use("/todos", todoRoutes);
 app.use("/auth", authRoutes);
-app.use("/api", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+app.use("/api", swaggerUi.serve, swaggerUi.setup(specs, { customCssUrl: CSS_URL }));
+
 
 app.get('/', (req, res) => {
   res.send('Hello World from Vercel!');
