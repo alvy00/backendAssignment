@@ -22,27 +22,23 @@ const options = {
       title: "Library API",
       version: "1.0.0",
       description: "A simple Express Library API",
+      termsOfService: "http://example.com/terms/",
+      contact: {
+        name: "API Support",
+        url: "http://www.exmaple.com/support",
+        email: "support@example.com",
+      },
+    },
     servers: [
       {
         url: "https://backendassignment-beta.vercel.app/",
         description: "My API Documentation",
       },
     ],
-    components: {
-      securitySchemes: {
-        BearerAuth: {
-          type: "http",
-          scheme: "bearer",
-          bearerFormat: "JWT",
-        },
-      },
-    },
-    security: [{ BearerAuth: [] }],
   },
   // This is to call all the file
   apis: ["./api/routes/authRoutes.js","./api/routes/todosRoutes.js"],
-}};
-
+};
 
 // Middlewares
 app.use(express.json());
