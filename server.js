@@ -4,15 +4,45 @@ const morgan = require('morgan');
 const dotenv = require('dotenv');
 const todoRoutes = require('./api/routes/todosRoutes');
 const authRoutes = require("./api/routes/authRoutes");
-const { swaggerUi, swaggerSpec } = require("./swaggerDoc");
+import swaggerUI from "swagger-ui-express";
+import swaggerJsDoc from "swagger-jsdoc";
 
 dotenv.config();
 
 const app = express();
 const port = process.env.PORT || 3001;
 
-const CSS_URL = "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
-const specs = swaggerJsDoc(options);
+const CSS_URL =
+  "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.1.0/swagger-ui.min.css";
+
+  const options = {
+    definition: {
+      openapi: "3.0.0",
+      info: {
+        title: "Library API",
+        version: "1.0.0",
+        description: "A simple Express Library API",
+      servers: [
+        {
+          url: "https://backendassignment-beta.vercel.app/",
+          description: "My API Documentation",
+        },
+      ],
+      components: {
+        securitySchemes: {
+          BearerAuth: {
+            type: "http",
+            scheme: "bearer",
+            bearerFormat: "JWT",
+          },
+        },
+      },
+      security: [{ BearerAuth: [] }],
+    },
+    // This is to call all the file
+    apis: ["./api/routes/authRoutes.js","./api/routes/todosRoutes.js"],
+  }};
+
 
 // Middlewares
 app.use(express.json());
