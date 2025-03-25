@@ -1,8 +1,7 @@
 const express = require("express");
 const router = express.Router();
-const checkAuth = require("../../controllers/authController"); // Ensure this points to your JWT check middleware
+const checkAuth = require("../../controllers/authController");
 
-// Your database access (replace with your actual DB client)
 const supabase = require("../../config/supabaseClient");
 
 /**
