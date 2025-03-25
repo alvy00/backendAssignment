@@ -2,6 +2,7 @@ const express = require('express');
 const serverless = require('serverless-http');
 const morgan = require('morgan');
 const dotenv = require('dotenv');
+const cors = require("cors");
 const todoRoutes = require('./api/routes/todosRoutes');
 const authRoutes = require("./api/routes/authRoutes");
 const swaggerUI = require("swagger-ui-express");
@@ -45,6 +46,7 @@ const specs = swaggerJsDoc(options);
 // Middlewares
 app.use(express.json());
 app.use(morgan('dev'));
+app.use(cors());
 app.use("/todos", todoRoutes);
 app.use("/auth", authRoutes);
 app.use(
