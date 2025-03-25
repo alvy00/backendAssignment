@@ -11,7 +11,7 @@ const saltRounds = 10;
  * /api/register:
  *   post:
  *     summary: Register a new user
- *     description: Creates a new user with email and password. Stores hashed password in Supabase.
+ *     description: Creates a new user with name, email, and password. Stores hashed password in Supabase.
  *     tags:
  *       - Authentication
  *     requestBody:
@@ -21,30 +21,54 @@ const saltRounds = 10;
  *           schema:
  *             type: object
  *             required:
+ *               - name
  *               - email
  *               - password
  *             properties:
+ *               name:
+ *                 type: string
+ *                 example: John Doe
  *               email:
  *                 type: string
+ *                 format: email
  *                 example: user@example.com
  *               password:
  *                 type: string
+ *                 format: password
  *                 example: securepassword123
  *     responses:
  *       201:
  *         description: User registered successfully
+ *         content:
+ *           application/json:
+ *             schema:
+ *               type: object
+ *               properties:
+ *                 message:
+ *                   type: string
+ *                   example: User registered successfully
+ *                 user:
+ *                   type: object
+ *                   properties:
+ *                     id:
+ *                       type: integer
+ *                       example: 1
+ *                     email:
+ *                       type: string
+ *                       example: user@example.com
  *       400:
- *         description: Email and password are required
+ *         description: Name, email and password are required
  *       409:
  *         description: Email already in use
  *       500:
  *         description: Registration error
  */
-router.post("/register", async (req, res) => {
-  const { email, password } = req.body;
 
-  if (!email || !password)
-    return res.status(400).json({ message: "Email and password are required" });
+router.post("/register", async (req, res) => {
+  const { name, email, password } = req.body;
+
+  if (!email || !password || !name)
+    return res.status(400).json({ message: "Name, email and password are required" });
 
   try {
     const { data: existingUsers } = await supabase
@@ -60,7 +84,7 @@ router.post("/register", async (req, res) => {
 
     const { data, error } = await supabase
       .from("users")
-      .insert([{ email, password: hashedPassword }])
+      .insert([{ name, email, password: hashedPassword }])
       .select("id, email")
       .single();
 
