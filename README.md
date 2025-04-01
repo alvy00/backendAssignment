@@ -39,17 +39,15 @@ cp .env.example .env
 npm run dev
 ```
 
-🔐 Authentication
+## 🔐 Authentication
 This backend uses JWT Authentication. To access protected routes, you will need to send a valid token in the Authorization header.
 
-🛠 Technologies Used
-🖥 Express.js for backend server
+## 🛠 Technologies Used
 
-🌍 Supabase for database management
-
-📄 Swagger UI for API documentation
-
-🔑 jsonwebtoken for JWT authentication
+- 🖥 Express.js for backend server
+- 🌍 Supabase for database management
+- 📄 Swagger UI for API documentation
+- 🔑 jsonwebtoken for JWT authentication
 
 ## Author
 
