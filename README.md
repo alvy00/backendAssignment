@@ -9,7 +9,7 @@
   </a>
 </p>
 
-> An user authenticated backed for a Todo App
+> An user authenticated backend for a Todo App
 
 ### ✨ [Demo](https://backendassignment-beta.vercel.app/)
 
@@ -22,14 +22,34 @@
 - ⚡ Fast and lightweight
 
 
+### 🧑‍💻 Prerequisites
+
+- 🌐 **Node.js** (v14 or higher)
+- 🛠 **npm** (or **yarn**)
+- 🔑 **Supabase** account for database setup
+
+
 ## Install
 
-```sh
+```bash
 git clone https://github.com/alvy00/backendAssignment.git
-cd backend
+cd backendAssignment
 npm install
-npm start
+cp .env.example .env
+npm run dev
 ```
+
+🔐 Authentication
+This backend uses JWT Authentication. To access protected routes, you will need to send a valid token in the Authorization header.
+
+🛠 Technologies Used
+🖥 Express.js for backend server
+
+🌍 Supabase for database management
+
+📄 Swagger UI for API documentation
+
+🔑 jsonwebtoken for JWT authentication
 
 ## Author
 
